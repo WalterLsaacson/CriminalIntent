@@ -5,8 +5,6 @@ import android.support.v4.app.Fragment;
 import com.guanyin.sardar.criminalintent.utils.SingleFragmentActivity;
 
 public class CrimeActivity extends SingleFragmentActivity {
-
-
     @Override
     protected Fragment createFragment() {
         return null;
