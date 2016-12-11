@@ -8,9 +8,7 @@ import android.support.v4.app.FragmentManager;
 import com.guanyin.sardar.criminalintent.CrimeListFragment;
 import com.guanyin.sardar.criminalintent.R;
 
-/**
- * Created by Sardar on 2016/12/9.
- */
+
 // 抽象类对所有将持有fragment引用的activity的抽象
 public abstract class SingleFragmentActivity extends FragmentActivity {
     protected abstract Fragment createFragment();
@@ -24,7 +22,7 @@ public abstract class SingleFragmentActivity extends FragmentActivity {
         Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_container);
 
         if (fragment == null) {
-            fragment = new CrimeListFragment();
+            fragment = createFragment();
             fragmentManager.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
     }

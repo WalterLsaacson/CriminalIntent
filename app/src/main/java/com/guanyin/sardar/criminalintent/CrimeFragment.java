@@ -14,6 +14,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import com.guanyin.sardar.criminalintent.model.Crime;
+import com.guanyin.sardar.criminalintent.model.CrimeLab;
+
+import java.util.UUID;
 
 
 // 管理陋习的编辑界面
@@ -25,10 +28,28 @@ public class CrimeFragment extends Fragment {
     Button mDateButton;
     CheckBox mSolvedCheckbox;
 
+    // 使用fragment args的做法
+    // 1.声明当前fragment的参数名称
+    // 2.创建newInstance的方法用于封装增加args到当前fragment的行为
+
+    private static final String ARG_CRIME_ID = "crime_id";
+
+
+    public static CrimeFragment newInstance(UUID crimeId) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_CRIME_ID, crimeId);
+
+        CrimeFragment fragment = new CrimeFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCrime = new Crime();
+        UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
+        mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
     }
 
     @Nullable
@@ -39,6 +60,7 @@ public class CrimeFragment extends Fragment {
 
         // 在edittext控件中对陋习的标题进行修改
         mTitleField = (EditText) view.findViewById(R.id.crime_title);
+        mTitleField.setText(mCrime.getTitle());
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -62,6 +84,7 @@ public class CrimeFragment extends Fragment {
         mDateButton.setEnabled(false);
         // 设置根据复选框的状态改变crime的属性（solved属性）
         mSolvedCheckbox = (CheckBox) view.findViewById(R.id.crime_solved);
+        mSolvedCheckbox.setChecked(mCrime.isSolved());
         mSolvedCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

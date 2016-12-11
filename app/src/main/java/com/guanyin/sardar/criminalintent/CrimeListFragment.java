@@ -1,11 +1,11 @@
 package com.guanyin.sardar.criminalintent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +14,6 @@ import android.widget.TextView;
 
 import com.guanyin.sardar.criminalintent.model.Crime;
 import com.guanyin.sardar.criminalintent.model.CrimeLab;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -32,7 +30,7 @@ import java.util.List;
 public class CrimeListFragment extends Fragment {
 
     private RecyclerView mCrimeRecyclerView;
-    private CrimeAdapter mCrimeAdapter;
+    CrimeAdapter mCrimeAdapter;
 
     @Nullable
     @Override
@@ -43,24 +41,35 @@ public class CrimeListFragment extends Fragment {
         mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         updateUI();
-        Log.e("CrimeListFragment", "创建视图");
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
     }
 
     private void updateUI() {
         CrimeLab crimelab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimelab.getCrimes();
 
-        mCrimeAdapter = new CrimeAdapter(crimes);
-        mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+        if (mCrimeAdapter == null) {
+            mCrimeAdapter = new CrimeAdapter(crimes);
+            mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+        } else {
+            mCrimeAdapter.notifyDataSetChanged();
+        }
     }
 
     // 匿名内部类 为recycler view创建view holder
-    private class CrimeHolder extends RecyclerView.ViewHolder {
+    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView mTitleTextView;
 
-        private TextView mDateTextView;
-        private CheckBox mSolvedCheckBox;
+        public TextView mDateTextView;
+        public CheckBox mSolvedCheckBox;
+
+        private Crime mCrime;
 
         public CrimeHolder(View itemView) {
             super(itemView);
@@ -69,14 +78,23 @@ public class CrimeListFragment extends Fragment {
             mDateTextView = (TextView) itemView.findViewById(R.id.list_item_crime_date_text_view);
             mSolvedCheckBox = (CheckBox) itemView.findViewById(R.id
                     .list_item_crime_solved_check_box);
-
+            itemView.setOnClickListener(this);
 
         }
 
         public void bindCrime(Crime crime) {
+            // 这一句的作用是响应点击事件时 可以拿到当前条目的数据
+            mCrime = crime;
             mTitleTextView.setText(crime.getTitle());
             mDateTextView.setText(crime.getDate().toString());
             mSolvedCheckBox.setChecked(crime.isSolved());
+            mSolvedCheckBox.setClickable(false);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+            startActivity(intent);
         }
     }
 
