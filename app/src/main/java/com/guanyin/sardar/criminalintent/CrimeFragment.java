@@ -19,7 +19,9 @@ import android.widget.EditText;
 import com.guanyin.sardar.criminalintent.model.Crime;
 import com.guanyin.sardar.criminalintent.model.CrimeLab;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.UUID;
 
 
@@ -30,11 +32,19 @@ public class CrimeFragment extends Fragment {
     EditText mTitleField;
 
     Button mDateButton;
+    Button mTimeButton;
     CheckBox mSolvedCheckbox;
 
+    // 从date对象中获取的字段
+    int hour;
+    int minute;
+
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_TIME = 1;
 
     private static final String DIALOG_DATE = "DialogDate";
+    private static final String DIALOG_TIME = "DialogTime";
+
     // 使用fragment args的做法
     // 1.声明当前fragment的参数名称
     // 2.创建newInstance的方法用于封装增加args到当前fragment的行为
@@ -65,6 +75,7 @@ public class CrimeFragment extends Fragment {
     Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_crime, container, false);
 
+
         // 在edittext控件中对陋习的标题进行修改
         mTitleField = (EditText) view.findViewById(R.id.crime_title);
         mTitleField.setText(mCrime.getTitle());
@@ -87,7 +98,6 @@ public class CrimeFragment extends Fragment {
 
         // 设置按钮的文本并禁用它的点击功能
         mDateButton = (Button) view.findViewById(R.id.crime_date);
-        mDateButton.setText(mCrime.getDate().toString());
         // 拓展点击功能
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,6 +108,20 @@ public class CrimeFragment extends Fragment {
                 dialog.show(manager, DIALOG_DATE);
             }
         });
+        // 额外的设置小时和分钟的按钮
+        mTimeButton = (Button) view.findViewById(R.id.crime_time);
+
+        mTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager manager = getFragmentManager();
+                TimePickerFragment timeDialog = TimePickerFragment.newInstance(mCrime.getDate());
+                timeDialog.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
+                timeDialog.show(manager, DIALOG_TIME);
+            }
+        });
+        // 更新视图的内容
+        updateUI();
         // 设置根据复选框的状态改变crime的属性（solved属性）
         mSolvedCheckbox = (CheckBox) view.findViewById(R.id.crime_solved);
         mSolvedCheckbox.setChecked(mCrime.isSolved());
@@ -110,6 +134,7 @@ public class CrimeFragment extends Fragment {
         return view;
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK)
@@ -117,7 +142,42 @@ public class CrimeFragment extends Fragment {
         if (requestCode == REQUEST_DATE) {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
+            // 更新视图
             mDateButton.setText(mCrime.getDate().toString());
         }
+        if (requestCode == REQUEST_TIME) {
+            Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+            // 第一步：从原有的date中拿到年月日的信息
+            Calendar mCalendar = Calendar.getInstance();
+            mCalendar.setTime(mCrime.getDate());
+            int year = mCalendar.get(Calendar.YEAR);
+            int month = mCalendar.get(Calendar.MONTH);
+            int day = mCalendar.get(Calendar.DAY_OF_MONTH);
+            // 第二步：从传过来的数据中拿到小时、分钟的信息
+            Calendar mCalendar1 = Calendar.getInstance();
+            mCalendar1.setTime(date);
+            int hour = mCalendar1.get(Calendar.HOUR);
+            int minute = mCalendar1.get(Calendar.MINUTE);
+            // 第三步：合并数据，并保存在crime对象中
+            Calendar calendar = new GregorianCalendar(year, month, day, hour, minute);
+            mCrime.setDate(calendar.getTime());
+            // 更新视图
+            updateUI();
+        }
+    }
+
+    private void updateUI() {
+        // 根据当前的crime的数据更新视图
+        getTime(mCrime.getDate());
+        String text = hour + ":" + minute;
+        mTimeButton.setText(text);
+        mDateButton.setText(mCrime.getDate().toString());
+    }
+
+    private void getTime(Date date) {
+        Calendar mCalendar = Calendar.getInstance();
+        mCalendar.setTime(date);
+        hour = mCalendar.get(Calendar.HOUR);
+        minute = mCalendar.get(Calendar.MINUTE);
     }
 }
