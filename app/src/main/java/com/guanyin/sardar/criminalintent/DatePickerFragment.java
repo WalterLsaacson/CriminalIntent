@@ -24,7 +24,7 @@ public class DatePickerFragment extends DialogFragment {
 
     private static final String ARG_DATE = "date";
 
-    private static final String EXTRA_DATE = "com.guanyin.sardar.criminalintent.date";
+    public static final String EXTRA_DATE = "com.guanyin.sardar.criminalintent.date";
 
     // 使用fragment的设置参数方法的通用做法
     public static DatePickerFragment newInstance(Date date) {

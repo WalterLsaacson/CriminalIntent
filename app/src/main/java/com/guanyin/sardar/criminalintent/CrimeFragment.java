@@ -1,5 +1,7 @@
 package com.guanyin.sardar.criminalintent;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,6 +19,7 @@ import android.widget.EditText;
 import com.guanyin.sardar.criminalintent.model.Crime;
 import com.guanyin.sardar.criminalintent.model.CrimeLab;
 
+import java.util.Date;
 import java.util.UUID;
 
 
@@ -105,5 +108,16 @@ public class CrimeFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK)
+            return;
+        if (requestCode == REQUEST_DATE) {
+            Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+            mCrime.setDate(date);
+            mDateButton.setText(mCrime.getDate().toString());
+        }
     }
 }
