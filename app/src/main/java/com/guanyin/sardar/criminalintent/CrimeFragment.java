@@ -3,6 +3,7 @@ package com.guanyin.sardar.criminalintent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -28,6 +29,9 @@ public class CrimeFragment extends Fragment {
     Button mDateButton;
     CheckBox mSolvedCheckbox;
 
+    private static final int REQUEST_DATE = 0;
+
+    private static final String DIALOG_DATE = "DialogDate";
     // 使用fragment args的做法
     // 1.声明当前fragment的参数名称
     // 2.创建newInstance的方法用于封装增加args到当前fragment的行为
@@ -81,7 +85,16 @@ public class CrimeFragment extends Fragment {
         // 设置按钮的文本并禁用它的点击功能
         mDateButton = (Button) view.findViewById(R.id.crime_date);
         mDateButton.setText(mCrime.getDate().toString());
-        mDateButton.setEnabled(false);
+        // 拓展点击功能
+        mDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager manager = getFragmentManager();
+                DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+                dialog.show(manager, DIALOG_DATE);
+            }
+        });
         // 设置根据复选框的状态改变crime的属性（solved属性）
         mSolvedCheckbox = (CheckBox) view.findViewById(R.id.crime_solved);
         mSolvedCheckbox.setChecked(mCrime.isSolved());
