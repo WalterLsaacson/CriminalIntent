@@ -8,7 +8,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -67,6 +71,8 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+        // 这一句代码告诉托管当前fragment的activity，当前fragment可以处理创建菜单的请求
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -134,6 +140,25 @@ public class CrimeFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.crime_delete, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.crime_delete:
+                CrimeLab crimeLab = CrimeLab.get(getActivity());
+                crimeLab.delCrime(mCrime);
+                getActivity().finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -169,8 +194,18 @@ public class CrimeFragment extends Fragment {
     private void updateUI() {
         // 根据当前的crime的数据更新视图
         getTime(mCrime.getDate());
-        String text = hour + ":" + minute;
-        mTimeButton.setText(text);
+        StringBuilder stringBuffer = new StringBuilder();
+        if (hour < 10) {
+            stringBuffer.append("0").append(hour).append(":");
+        } else {
+            stringBuffer.append(hour).append(":");
+        }
+        if (minute < 10) {
+            stringBuffer.append("0").append(minute);
+        } else {
+            stringBuffer.append(minute);
+        }
+        mTimeButton.setText(stringBuffer.toString());
         mDateButton.setText(mCrime.getDate().toString());
     }
 

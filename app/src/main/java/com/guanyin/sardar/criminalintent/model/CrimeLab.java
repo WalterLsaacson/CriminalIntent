@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Sardar on 2016/12/9.
- */
+
 // 维护一个list来保存已经发现的陋习，生命周期和本应用一样长
 public class CrimeLab {
     private static CrimeLab sCrimeLab;
@@ -25,12 +23,12 @@ public class CrimeLab {
     private CrimeLab(Context context) {
         mCrimes = new ArrayList<>();
         // 初始化100条陋习
-        for (int i = 0; i < 100; i++) {
-            Crime crime = new Crime();
-            crime.setTitle("Crime #" + i);
-            crime.setSolved(i % 2 == 0);
-            mCrimes.add(crime);
-        }
+//        for (int i = 0; i < 100; i++) {
+//            Crime crime = new Crime();
+//            crime.setTitle("Crime #" + i);
+//            crime.setSolved(i % 2 == 0);
+//            mCrimes.add(crime);
+//        }
     }
 
     // 获取陋习列表
@@ -47,6 +45,16 @@ public class CrimeLab {
             }
         }
         return null;
+    }
+
+    // 添加crime到列表
+    public void addCrime(Crime crime) {
+        mCrimes.add(crime);
+    }
+
+    //添加crime到列表
+    public void delCrime(Crime crime) {
+        mCrimes.remove(crime);
     }
 
 }

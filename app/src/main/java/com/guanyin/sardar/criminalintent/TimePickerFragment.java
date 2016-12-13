@@ -77,7 +77,6 @@ public class TimePickerFragment extends DialogFragment {
                             Calendar calendar = new GregorianCalendar(0, 0, 0, hour, minute);
                             Date date1 = calendar.getTime();
                             sendResult(Activity.RESULT_OK, date1);
-                            // TODO 24小时制的返回结果
                         }
                     }
                 })
