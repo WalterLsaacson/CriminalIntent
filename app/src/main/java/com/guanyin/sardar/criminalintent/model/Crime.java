@@ -14,6 +14,16 @@ public class Crime {
     // 这个陋习是否已经被解决
     private boolean mSolved;
 
+    public String getSuspect() {
+        return mSuspect;
+    }
+
+    public void setSuspect(String suspect) {
+        mSuspect = suspect;
+    }
+
+    private String mSuspect;
+
     public UUID getId() {
         return mId;
     }
